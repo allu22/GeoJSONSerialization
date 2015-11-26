@@ -21,6 +21,9 @@
 // THE SOFTWARE.
 
 #import "GeoJSONSerialization.h"
+#import "MKPointAnnotation+GeoJSONExtension.h"
+#import "MKPolyline+GeoJSONExtension.h"
+#import "MKPolygon+GeoJSONExtension.h"
 
 #pragma mark - Geometry Primitives
 
@@ -61,10 +64,13 @@ static MKPointAnnotation * MKPointAnnotationFromGeoJSONPointFeature(NSDictionary
 
     MKPointAnnotation *pointAnnotation = [[MKPointAnnotation alloc] init];
     pointAnnotation.coordinate = CLLocationCoordinateFromCoordinates(geometry[@"coordinates"]);
+    pointAnnotation.geoJSON_id = [NSNumber numberWithInt: [feature[@"id"] intValue]];
 
     NSDictionary *properties = [NSDictionary dictionaryWithDictionary:feature[@"properties"]];
     pointAnnotation.title = properties[@"title"];
     pointAnnotation.subtitle = properties[@"subtitle"];
+    
+    pointAnnotation.geoJSON_featureProperties = properties;
 
     return pointAnnotation;
 }
@@ -78,10 +84,13 @@ static MKPolyline * MKPolylineFromGeoJSONLineStringFeature(NSDictionary *feature
     CLLocationCoordinate2D *polylineCoordinates = CLCreateLocationCoordinatesFromCoordinatePairs(coordinatePairs);
     MKPolyline *polyLine = [MKPolyline polylineWithCoordinates:polylineCoordinates count:[coordinatePairs count]];
     free(polylineCoordinates);
+    polyLine.geoJSON_id = [NSNumber numberWithInt: [feature[@"id"] intValue]];
 
     NSDictionary *properties = [NSDictionary dictionaryWithDictionary:feature[@"properties"]];
     polyLine.title = properties[@"title"];
     polyLine.subtitle = properties[@"subtitle"];
+    
+    polyLine.geoJSON_featureProperties = properties;
 
     return polyLine;
 }
@@ -115,10 +124,13 @@ static MKPolygon * MKPolygonFromGeoJSONPolygonFeature(NSDictionary *feature) {
         }
             break;
     }
+    polygon.geoJSON_id = [NSNumber numberWithInt: [feature[@"id"] intValue]];
 
     NSDictionary *properties = [NSDictionary dictionaryWithDictionary:feature[@"properties"]];
     polygon.title = properties[@"title"];
     polygon.subtitle = properties[@"subtitle"];
+    
+    polygon.geoJSON_featureProperties = properties;
 
     return polygon;
 }
